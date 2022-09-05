@@ -46,9 +46,7 @@
 
  const privateKey = process.env.SECRET_KEY;
  const infura = process.env.INFURA_KEY;
-
- console.log(privateKey);
- console.log(infura);
+ const TEST_ETHERSCAN = process.env.TEST_ETHERSCAN;
 
 module.exports = {
   /**
@@ -127,6 +125,12 @@ module.exports = {
         evmVersion: "istanbul"
       }
     }
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: TEST_ETHERSCAN
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
