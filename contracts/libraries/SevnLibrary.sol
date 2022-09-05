@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 pragma solidity >=0.5.0;
 
 import '../interfaces/ISevnPair.sol';
@@ -21,7 +23,7 @@ library SevnLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'92758cc962dddc16064dfe0ba11688dd303587ba9e0e92bad7279a45459f640a' // init code hash
+                hex'8d5857c4bfb8e9df39b122b74a111eb551eedeaf30bf8367a25ee8508ede30bb' // init code hash
             ))));
     }
 

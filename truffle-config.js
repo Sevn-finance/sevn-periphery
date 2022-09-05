@@ -41,10 +41,14 @@
  * https://trufflesuite.com/docs/truffle/getting-started/using-the-truffle-dashboard/
  */
 
-// require('dotenv').config();
-// const { MNEMONIC, PROJECT_ID } = process.env;
+ require('dotenv').config();
+ const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+ const privateKey = process.env.SECRET_KEY;
+ const infura = process.env.INFURA_KEY;
+
+ console.log(privateKey);
+ console.log(infura);
 
 module.exports = {
   /**
@@ -58,6 +62,14 @@ module.exports = {
    */
 
   networks: {
+    ropsten: {
+      provider: () => new HDWalletProvider([privateKey], `https://ropsten.infura.io/v3/${infura}`),
+      network_id: 3,       // Ropsten's id
+      gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache, geth, or parity) in a separate terminal
