@@ -10,7 +10,6 @@ import './interfaces/ISevnRouter02.sol';
 import './interfaces/ISevnFactory.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IWETH.sol';
-import './interfaces/ISwapReduction.sol';
 
 
 contract SevnRouter02 is ISevnRouter02, Ownable {
@@ -18,7 +17,6 @@ contract SevnRouter02 is ISevnRouter02, Ownable {
 
     address public immutable override factory;
     address public immutable override WETH;
-    address public override swapFeeReward;
 
     modifier ensure(uint deadline) {
         require(deadline >= block.timestamp, 'SevnRouter: EXPIRED');
@@ -34,9 +32,11 @@ contract SevnRouter02 is ISevnRouter02, Ownable {
         assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
     }
 
-     function setSwapFeeReward(address _swapFeeReward) public onlyOwner {
-        swapFeeReward = _swapFeeReward;
-    }
+    event SwapRouter(
+        uint[] amounts, 
+        address[] path, 
+        address indexed to
+    );
 
     // **** ADD LIQUIDITY ****
     function _addLiquidity(
@@ -224,16 +224,14 @@ contract SevnRouter02 is ISevnRouter02, Ownable {
             (address token0,) = SevnLibrary.sortTokens(input, output);
             uint amountOut = amounts[i + 1];
             (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
-            
-            if (swapFeeReward != address(0)) {
-                ISwapReduction(swapFeeReward).swap(msg.sender, input, output, amountOut);
-            }
-            
+                        
             address to = i < path.length - 2 ? SevnLibrary.pairFor(factory, output, path[i + 2]) : _to;
             ISevnPair(SevnLibrary.pairFor(factory, input, output)).swap(
                 amount0Out, amount1Out, to, new bytes(0)
             );
         }
+
+        emit SwapRouter(amounts, path, _to);
     }
     function swapExactTokensForTokens(
         uint amountIn,
@@ -344,10 +342,6 @@ contract SevnRouter02 is ISevnRouter02, Ownable {
             (uint reserveInput, uint reserveOutput) = input == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
             amountInput = IERC20(input).balanceOf(address(pair)).sub(reserveInput);
             amountOutput = SevnLibrary.getAmountOut(amountInput, reserveInput, reserveOutput, pair.getSwapFee());
-            }
-
-            if (swapFeeReward != address(0)) {
-                ISwapReduction(swapFeeReward).swap(msg.sender, input, output, amountOutput);
             }
 
             (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOutput) : (amountOutput, uint(0));

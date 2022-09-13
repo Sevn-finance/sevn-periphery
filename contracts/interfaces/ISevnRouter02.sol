@@ -3,7 +3,6 @@ pragma solidity >=0.6.2;
 interface ISevnRouter02 {
     function factory() external pure returns (address);
     function WETH() external pure returns (address);
-    function swapFeeReward() external pure returns (address);
 
     function addLiquidity(
         address tokenA,
@@ -132,4 +131,10 @@ interface ISevnRouter02 {
         address to,
         uint deadline
     ) external;
+
+    event SwapRouter(
+        uint[] amounts, 
+        address[] path, 
+        address indexed to
+    );
 }
